@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('web.account_collection', account=account_name) }}{% endblock %}
+
+{% block content %}
+<div class="account-collection">
+    <h1>{{ t('web.account_collection', account=account_name) }}</h1>
+    
+    <div class="collection-stats">
+        <div class="stat-card">
+            <h3>{{ t('web.unique_cards') }}</h3>
+            <p class="stat-value">{{ total_unique }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ t('web.total_copies') }}</h3>
+            <p class="stat-value">{{ total_copies }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ t('web.sets_owned') }}</h3>
+            <p class="stat-value">{{ sets_data|length }}</p>
+        </div>
+    </div>
+
+    {% for set in sets_data %}
+    <div class="set-section">
+        <h2>{{ set.set_name }} ({{ set.set_code }})</h2>
+        
+        <!-- ? COVER IMAGE - Usa /tcg_images/ -->
+        {% if set.cover_path %}
+            <img src="/tcg_images/{{ set.set_code }}/cover.png" 
+                 alt="Set Cover" 
+                 class="set-cover"
+                 onerror="this.style.display='none'">
+        {% endif %}
+
+        <div class="owned-cards">
+            {% for card in set.cards %}
+            <div class="card-thumbnail">
+                <!-- ? CARD IMAGE - Usa /tcg_images/cards/ -->
+                <img src="/tcg_images/cards/{{ card.set_code }}_{{ card.card_number }}.webp" 
+                     alt="{{ card.card_name }}"
+                     title="{{ card.card_name }} x{{ card.quantity }}"
+                     class="thumbnail"
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22210%22%3E%3Crect fill=%22%23222%22 width=%22150%22 height=%22210%22/%3E%3Ctext x=%2275%22 y=%22105%22 text-anchor=%22middle%22 fill=%22%23888%22 font-size=%2212%22%3E%F0%9F%93%B7%3C/text%3E%3C/svg%3E'">
+                
+                <div class="card-overlay">
+                    <span class="quantity">x{{ card.quantity }}</span>
+                    <p class="rarity">{{ card.rarity }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+
+    {% if not sets_data %}
+    <div class="empty-state">
+        <p>{{ t('web.no_collections_found') }}</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.account-collection {
+    padding: 20px;
+}
+
+.collection-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: #2a2a2a;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #007bff;
+    margin-top: 10px;
+}
+
+.set-section {
+    margin-bottom: 40px;
+    padding: 20px;
+    background: #1a1a1a;
+    border-radius: 8px;
+}
+
+.set-cover {
+    width: 100px;
+    height: auto;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}
+
+.owned-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.card-thumbnail {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.card-thumbnail:hover {
+    transform: scale(1.05);
+}
+
+.thumbnail {
+    width: 100%;
+    height: auto;
+    display: block;
+    background: #222;
+}
+
+.card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.card-thumbnail:hover .card-overlay {
+    opacity: 1;
+}
+
+.quantity {
+    font-weight: bold;
+    color: #00ff00;
+    font-size: 14px;
+}
+
+.rarity {
+    color: #ffd700;
+    font-size: 12px;
+    margin: 0;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #888;
+}
+</style>
+{% endblock %}
